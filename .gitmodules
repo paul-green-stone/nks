@@ -1,0 +1,3 @@
+[submodule "ps-sdl-wrapper"]
+	path = ps-sdl-wrapper
+	url = https://github.com/paul-green-stone/ps-sdl-wrapper.git
