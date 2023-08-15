@@ -412,3 +412,213 @@ void rule_19(unsigned char* current, unsigned char* previous, size_t size) {
 
     return ;
 }
+
+/* ================================ */
+
+void rule_20(unsigned char* current, unsigned char* previous, size_t size) {
+    ssize_t i = 0;
+
+    char left;
+    char middle;
+    char right;
+
+    for (; i < size; i++) {
+
+        left = ((i - 1) < 0) ? previous[size - 1] : previous[i - 1];
+        middle = previous[i];
+        right = ((i + 1) >= size) ? previous[0] : previous[i + 1];
+
+        current[i] = (left && !middle && !right) || (!left && middle && !right);
+    }
+
+    return ;
+}
+
+/* ================================ */
+
+void rule_21(unsigned char* current, unsigned char* previous, size_t size) {
+    ssize_t i = 0;
+
+    char left;
+    char middle;
+    char right;
+
+    for (; i < size; i++) {
+
+        left = ((i - 1) < 0) ? previous[size - 1] : previous[i - 1];
+        middle = previous[i];
+        right = ((i + 1) >= size) ? previous[0] : previous[i + 1];
+
+        current[i] = (!middle && !right) || (!left && !right);
+    }
+
+    return ;
+}
+
+/* ================================ */
+
+void rule_22(unsigned char* current, unsigned char* previous, size_t size) {
+    ssize_t i = 0;
+
+    char left;
+    char middle;
+    char right;
+
+    for (; i < size; i++) {
+
+        left = ((i - 1) < 0) ? previous[size - 1] : previous[i - 1];
+        middle = previous[i];
+        right = ((i + 1) >= size) ? previous[0] : previous[i + 1];
+
+        current[i] = (left && !middle && !right) || (!left && middle && !right) || (!left && !middle && right);
+    }
+
+    return ;
+}
+
+/* ================================ */
+
+void rule_23(unsigned char* current, unsigned char* previous, size_t size) {
+    ssize_t i = 0;
+
+    char left;
+    char middle;
+    char right;
+
+    for (; i < size; i++) {
+
+        left = ((i - 1) < 0) ? previous[size - 1] : previous[i - 1];
+        middle = previous[i];
+        right = ((i + 1) >= size) ? previous[0] : previous[i + 1];
+
+        current[i] = (!middle && !right) &&  (!left && !right) && (!left && !middle);
+    }
+
+    return ;
+}
+
+/* ================================ */
+
+void rule_24(unsigned char* current, unsigned char* previous, size_t size) {
+    ssize_t i = 0;
+
+    char left;
+    char middle;
+    char right;
+
+    for (; i < size; i++) {
+
+        left = ((i - 1) < 0) ? previous[size - 1] : previous[i - 1];
+        middle = previous[i];
+        right = ((i + 1) >= size) ? previous[0] : previous[i + 1];
+
+        current[i] = (left && !middle && !right) || (!left && middle && right);
+    }
+
+    return ;
+}
+
+/* ================================ */
+
+void rule_25(unsigned char* current, unsigned char* previous, size_t size) {
+    ssize_t i = 0;
+
+    char left;
+    char middle;
+    char right;
+
+    for (; i < size; i++) {
+
+        left = ((i - 1) < 0) ? previous[size - 1] : previous[i - 1];
+        middle = previous[i];
+        right = ((i + 1) >= size) ? previous[0] : previous[i + 1];
+
+        current[i] = (!left && middle && right) || (!middle && !right);
+    }
+
+    return ;
+}
+
+/* ================================ */
+
+void rule_26(unsigned char* current, unsigned char* previous, size_t size) {
+    ssize_t i = 0;
+
+    char left;
+    char middle;
+    char right;
+
+    for (; i < size; i++) {
+
+        left = ((i - 1) < 0) ? previous[size - 1] : previous[i - 1];
+        middle = previous[i];
+        right = ((i + 1) >= size) ? previous[0] : previous[i + 1];
+
+        current[i] = (left && !middle && !right) || (!left && right);
+    }
+
+    return ;
+}
+
+/* ================================ */
+
+void rule_27(unsigned char* current, unsigned char* previous, size_t size) {
+    ssize_t i = 0;
+
+    char left;
+    char middle;
+    char right;
+
+    for (; i < size; i++) {
+
+        left = ((i - 1) < 0) ? previous[size - 1] : previous[i - 1];
+        middle = previous[i];
+        right = ((i + 1) >= size) ? previous[0] : previous[i + 1];
+
+        current[i] = (!middle && !right) || (!left && right);
+    }
+
+    return ;
+}
+
+/* ================================ */
+
+void rule_28(unsigned char* current, unsigned char* previous, size_t size) {
+    ssize_t i = 0;
+
+    char left;
+    char middle;
+    char right;
+
+    for (; i < size; i++) {
+
+        left = ((i - 1) < 0) ? previous[size - 1] : previous[i - 1];
+        middle = previous[i];
+        right = ((i + 1) >= size) ? previous[0] : previous[i + 1];
+
+        current[i] = (left && !middle && !right) || (!left && middle);
+    }
+
+    return ;
+}
+
+/* ================================ */
+
+void rule_29(unsigned char* current, unsigned char* previous, size_t size) {
+    ssize_t i = 0;
+
+    char left;
+    char middle;
+    char right;
+
+    for (; i < size; i++) {
+
+        left = ((i - 1) < 0) ? previous[size - 1] : previous[i - 1];
+        middle = previous[i];
+        right = ((i + 1) >= size) ? previous[0] : previous[i + 1];
+
+        current[i] = (!middle && !right) || (!left && middle);
+    }
+
+    return ;
+}

@@ -44,6 +44,16 @@ rule rules[] = {
     rule_17,
     rule_18,
     rule_19,
+    rule_20,
+    rule_21,
+    rule_22,
+    rule_23,
+    rule_24,
+    rule_25,
+    rule_26,
+    rule_27,
+    rule_28,
+    rule_29,
 };
 
 int main(int argc, char** argv) {
@@ -289,7 +299,7 @@ int main(int argc, char** argv) {
 
     if (SDL_Init(SDL_INIT_EVENTS | SDL_INIT_VIDEO) == 0) {
 
-        if ((window = Window_create("anks-ca", width, height, SDL_WINDOW_SHOWN, SURFACE, NONE)) != NULL) {
+        if ((window = Window_create("anks-ca", width, height, SDL_WINDOW_SHOWN, RENDERER, SDL_RENDERER_ACCELERATED)) != NULL) {
 
             /* Get a window context */
             context = Window_get_context(window);

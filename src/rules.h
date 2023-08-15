@@ -147,4 +147,74 @@ void rule_19(unsigned char* current, unsigned char* previous, size_t size);
 
 /* ================================================================ */
 
+/**
+ * Generate an array representing the current generation based on the previous one according to CA rule-20
+*/
+void rule_20(unsigned char* current, unsigned char* previous, size_t size);
+
+/* ================================================================ */
+
+/**
+ * Generate an array representing the current generation based on the previous one according to CA rule-21
+*/
+void rule_21(unsigned char* current, unsigned char* previous, size_t size);
+
+/* ================================================================ */
+
+/**
+ * Generate an array representing the current generation based on the previous one according to CA rule-22
+*/
+void rule_22(unsigned char* current, unsigned char* previous, size_t size);
+
+/* ================================================================ */
+
+/**
+ * Generate an array representing the current generation based on the previous one according to CA rule-23
+*/
+void rule_23(unsigned char* current, unsigned char* previous, size_t size);
+
+/* ================================================================ */
+
+/**
+ * Generate an array representing the current generation based on the previous one according to CA rule-24
+*/
+void rule_24(unsigned char* current, unsigned char* previous, size_t size);
+
+/* ================================================================ */
+
+/**
+ * Generate an array representing the current generation based on the previous one according to CA rule-25
+*/
+void rule_25(unsigned char* current, unsigned char* previous, size_t size);
+
+/* ================================================================ */
+
+/**
+ * Generate an array representing the current generation based on the previous one according to CA rule-26
+*/
+void rule_26(unsigned char* current, unsigned char* previous, size_t size);
+
+/* ================================================================ */
+
+/**
+ * Generate an array representing the current generation based on the previous one according to CA rule-27
+*/
+void rule_27(unsigned char* current, unsigned char* previous, size_t size);
+
+/* ================================================================ */
+
+/**
+ * Generate an array representing the current generation based on the previous one according to CA rule-28
+*/
+void rule_28(unsigned char* current, unsigned char* previous, size_t size);
+
+/* ================================================================ */
+
+/**
+ * Generate an array representing the current generation based on the previous one according to CA rule-29
+*/
+void rule_29(unsigned char* current, unsigned char* previous, size_t size);
+
+/* ================================================================ */
+
 #endif /* RULES_H */
