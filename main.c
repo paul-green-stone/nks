@@ -9,11 +9,7 @@
 
 /* ================================ */
 
-
-
-#define OPTSTRING ":x:y:gh"
-
-
+#define OPTSTRING ":x:y:g"
 
 /* ================================ */
 
@@ -26,7 +22,7 @@ void print_usage_message(const char* caller_name);
 /* Function pointer typedef */
 typedef void (*rule)(unsigned char* current, unsigned char* previous, size_t size);
 
-/* An array of the rules currently available */
+/* An array of rules currently available */
 rule rules[] = {
     rule_0,
     rule_1,
@@ -50,10 +46,8 @@ rule rules[] = {
     rule_19,
 };
 
-
 int main(int argc, char** argv) {
     /* =========== VARIABLES ========== */
-
 
     /* Window appearing on the screen */
     Window_t window = NULL;
@@ -73,13 +67,13 @@ int main(int argc, char** argv) {
     /* Cell size. 8 by default */
     int cell_size = 8;
 
-    /* Time interval between two generations. 0.3 by default */
-    float interval = 0.3;
+    /* Time interval between two generations. 10 / 1000 by default */
+    float interval = 10;
 
     /* Rule to apply */
     int rule = -1;
     
-    /* Ramdom start initials */
+    /* Random start initials */
     int random_start_init = 0;
 
     /* Current generation */
@@ -88,8 +82,14 @@ int main(int argc, char** argv) {
     /* Prvious generation */
     unsigned char* previous = NULL;
 
-    /* Size of arrays */
-    size_t size;
+    /* Number of rows */
+    size_t rows;
+
+    /* Number of columns */
+    size_t columns;
+
+    /* A dynamically allocated 2D array */
+    unsigned char** grid = NULL;
 
 
     /* Program exit code */
@@ -106,9 +106,13 @@ int main(int argc, char** argv) {
     /* Time related variables  */
     uint64_t start = 0;
     float delta = 0;
+    time_t t;
 
-    /* Loop traversing variable */
+    /* Loop variable */
     size_t i = 0;
+
+    /* Row and columns */
+    size_t r = 0, c = 0;
 
     /* Current command line option */
     int option;
@@ -127,8 +131,6 @@ int main(int argc, char** argv) {
 
     extern char* optarg;
     extern int optind, opterr, optopt;
-
-    time_t t;
 
     /* ================================ */
 
@@ -235,8 +237,26 @@ int main(int argc, char** argv) {
     /* Compute a new window height */
     height = ((height % cell_size) == 0) ? height : height - (height % cell_size);
 
-    /* Compute a size of a dynamically allocated array */
-    size = sizeof(char) * width / cell_size;
+
+
+    /* ================ Dynamically allocate a 2D array ================ */
+
+    /* Compute the number of rows */
+    rows = height / cell_size;
+
+    /* Compute the number of columns */
+    columns = width / cell_size;
+
+
+    grid = (unsigned char**) malloc(sizeof(unsigned char*) * rows);
+
+    for (i = 0; i < rows; i++) {
+        grid[i] = (char*) malloc(sizeof(unsigned char*) * columns);
+    }
+
+    i = 0;
+
+    /* ================================================================= */
 
     /* Update a cell */
     cell.w = cell.h = cell_size;
@@ -248,47 +268,31 @@ int main(int argc, char** argv) {
     lifespan = (lifespan == 0) ? height / cell_size : lifespan;
 
 
+    /* Random number generator initialization */
+    srand((unsigned) time(&t));
 
-    if (((current = (unsigned char*) malloc(sizeof(char) * (width / cell_size)))) && (previous = (unsigned char*) malloc(sizeof(char) * (width / cell_size))) != NULL) {
+    if (random_start_init) {
 
-        memset(current, 0, sizeof(char) * (width / cell_size));
-        memset(previous, 0, sizeof(char) * (width / cell_size));
-
-        /* Random number generator initialization */
-        srand((unsigned) time(&t));
-
-        if (random_start_init) {
-            for (; i < random_start_init; i++) {
-                current[rand() % size] = 1; 
-            }
+        for (i = 0; i < random_start_init; i++) {
+            grid[0][rand() % columns] = 1;
         }
-        else {
-            current[sizeof(char) * (width / cell_size) / 2] = 1;
-        }
-
-        i = 0;
-
-        rule = (rule == -1) ? rand() % 9 : rule;
     }
+    else {
+        grid[0][columns / 2] = 1;
+    }
+
+    i = 0;
+
+    rule = (rule == -1) ? rand() % 9 : rule;
 
     /* ================================ */
 
     if (SDL_Init(SDL_INIT_EVENTS | SDL_INIT_VIDEO) == 0) {
 
-        if ((window = Window_create("anks-ca", width, height, SDL_WINDOW_SHOWN, RENDERER, SDL_RENDERER_ACCELERATED)) != NULL) {
+        if ((window = Window_create("anks-ca", width, height, SDL_WINDOW_SHOWN, SURFACE, NONE)) != NULL) {
 
             /* Get a window context */
             context = Window_get_context(window);
-
-            Global_set_color(0xff, 0xff, 0xff, 0xff);
-
-            Window_clear(window);
-
-            Global_set_color(0x00, 0x00, 0x00, 0xff);
-
-            if (is_grid) {
-                Window_display_grid(window, cell_size);
-            }
 
             /* ================================ */
             
@@ -306,37 +310,61 @@ int main(int argc, char** argv) {
                     }
                 }
 
-                /* Render starts here */
+                /* =================== Render starts here =================== */
+                
+                /* Set color to white */
+                Global_set_color(0xff, 0xff, 0xff, 0xff);
 
-                if (generation < lifespan) {
+                /* Fill the window with white */
+                Window_clear(window);
 
-                    if (delta >= interval) {
+                /* Set color to black */
+                Global_set_color(0x00, 0x00, 0x00, 0xff);
 
-                        /* Traverse an array of cells */
-                        for (; i < size; i++) {
-                            
-                            if (current[i]) {
-                                cell.x = i * cell_size * (current[i] > 0);
-                                cell.y = generation * cell_size * (current[i] > 0);
-                                
-                                Rect_fill(&cell);
-                            }
+                /* Display a grid if specified */
+                if (is_grid) {
+                    Window_display_grid(window, cell_size);
+                }
+                
+
+
+                /* ============== Display a cellular automaton ============== */
+
+                for (r = 0; r < rows; r++) {
+
+                    for (c = 0; c < columns; c++) {
+
+                        if (grid[r][c]) {
+
+                            cell.x = c * cell_size * 1;
+                            cell.y = r * cell_size * 1;
+
+                            Rect_fill(&cell);
                         }
-
-                        delta = 0;
-                    }
-
-                    if (i >= size) {
-                        generation++;
-
-                        i = 0;
-
-                        swap(current, previous, size);
-
-                        rules[rule](current, previous, width / cell_size);
                     }
                 }
 
+
+                
+                /* ============== Update a cellular automaton =============== */
+
+                if (generation < lifespan - 1) {
+
+                    if (delta >= interval) {
+
+                        delta = 0;
+
+                        generation++;
+
+                        current = grid[generation];
+                        previous = grid[generation - 1];
+                        
+                        /* Apply a rule */
+                        rules[rule](current, previous, columns);
+                    }
+                }
+                
+                /* Update the screen */
                 Window_update(window);
 
                 delta += (SDL_GetTicks64() - start) / 1000.0f;
@@ -360,6 +388,8 @@ int main(int argc, char** argv) {
     free(current);
     free(previous);
 
+    free(grid);
+
     /* ================================ */
 
     return result;
@@ -380,9 +410,11 @@ void swap(char* a, char* b, size_t size) {
     return ;
 }
 
+/* ================================ */
+
 void print_usage_message(const char* caller_name) {
 
-    fprintf(stderr, "usage: %s [-xygh] [--cell=<size>] [--interval=<ms>] [--lifespan=<number>] [--rule=<CA rule>] [--start=<number>] [--help]\n", caller_name);
+    fprintf(stderr, "usage: %s [-xyg] [--cell=<size>] [--interval=<ms>] [--lifespan=<number>] [--rule=<CA rule>] [--start=<number>] [--help]\n", caller_name);
 
     return ;
 }
