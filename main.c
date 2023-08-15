@@ -22,40 +22,6 @@ void print_usage_message(const char* caller_name);
 /* Function pointer typedef */
 typedef void (*rule)(unsigned char* current, unsigned char* previous, size_t size);
 
-/* An array of rules currently available */
-rule rules[] = {
-    rule_0,
-    rule_1,
-    rule_2,
-    rule_3,
-    rule_4,
-    rule_5,
-    rule_6,
-    rule_7,
-    rule_8,
-    rule_9,
-    rule_10,
-    rule_11,
-    rule_12,
-    rule_13,
-    rule_14,
-    rule_15,
-    rule_16,
-    rule_17,
-    rule_18,
-    rule_19,
-    rule_20,
-    rule_21,
-    rule_22,
-    rule_23,
-    rule_24,
-    rule_25,
-    rule_26,
-    rule_27,
-    rule_28,
-    rule_29,
-};
-
 int main(int argc, char** argv) {
     /* =========== VARIABLES ========== */
 
@@ -369,8 +335,7 @@ int main(int argc, char** argv) {
                         current = grid[generation];
                         previous = grid[generation - 1];
                         
-                        /* Apply a rule */
-                        rules[rule](current, previous, columns);
+                        apply_CA_rule_N(current, previous, columns, rule);
                     }
                 }
                 
