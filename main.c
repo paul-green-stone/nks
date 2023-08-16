@@ -43,8 +43,8 @@ int main(int argc, char** argv) {
     /* Cell size. 8 by default */
     int cell_size = 8;
 
-    /* Time interval between two generations. 10 / 1000 by default */
-    float interval = 10;
+    /* Number of steps every second */
+    float speed = 60;
 
     /* Rule to apply */
     int rule = -1;
@@ -116,7 +116,7 @@ int main(int argc, char** argv) {
 
         static struct option options[] = {
             {"cell", required_argument, NULL, 0},           /* Cell size */
-            {"interval", required_argument, NULL, 0},       /* Time interval between two generations */
+            {"speed", required_argument, NULL, 0},          /* Number of steps every second */
             {"lifespan", required_argument, NULL, 0},       /* Number of generations a cellular automata has */
             {"rule", required_argument, NULL, 0},           /* Rule to apply */
             {"start", required_argument, NULL, 0},          /* Number of start initials */
@@ -144,7 +144,11 @@ int main(int argc, char** argv) {
                     cell_size = (int) strtol(optarg, NULL, 10);
                 }
                 else if (option_index == 1) {
-                    interval = (int) strtol(optarg, NULL, 10);
+                    speed = (int) strtol(optarg, NULL, 10);
+
+                    if (speed > 60) {
+                        speed = 60;
+                    }
                 }
                 else if (option_index == 2) {
                     lifespan = (int) strtol(optarg, NULL, 10);
@@ -228,6 +232,8 @@ int main(int argc, char** argv) {
 
     for (i = 0; i < rows; i++) {
         grid[i] = (char*) malloc(sizeof(unsigned char*) * columns);
+
+        memset(grid[i], 0, sizeof(unsigned char*) * columns);
     }
 
     i = 0;
@@ -238,7 +244,7 @@ int main(int argc, char** argv) {
     cell.w = cell.h = cell_size;
 
     /* Update time interval */
-    interval = interval / 1000;
+    speed = (1000. / speed) / 1000.;
 
     /* Update a new lifespan */
     lifespan = (lifespan == 0) ? height / cell_size : lifespan;
@@ -326,7 +332,7 @@ int main(int argc, char** argv) {
 
                 if (generation < lifespan - 1) {
 
-                    if (delta >= interval) {
+                    if (delta >= speed) {
 
                         delta = 0;
 
@@ -335,6 +341,7 @@ int main(int argc, char** argv) {
                         current = grid[generation];
                         previous = grid[generation - 1];
                         
+                        /* Apply a rule */
                         apply_CA_rule_N(current, previous, columns, rule);
                     }
                 }
@@ -389,7 +396,7 @@ void swap(char* a, char* b, size_t size) {
 
 void print_usage_message(const char* caller_name) {
 
-    fprintf(stderr, "usage: %s [-xyg] [--cell=<size>] [--interval=<ms>] [--lifespan=<number>] [--rule=<CA rule>] [--start=<number>] [--help]\n", caller_name);
+    fprintf(stderr, "usage: %s [-xyg] [--cell=<size>] [--speed=<number of steps in a second>] [--lifespan=<number>] [--rule=<CA rule>] [--start=<number>] [--help]\n", caller_name);
 
     return ;
 }
