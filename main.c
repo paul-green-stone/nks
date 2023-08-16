@@ -1,6 +1,4 @@
-#include "ps-sdl-wrapper/src/core.h"
-#include "ps-sdl-wrapper/src/types.h"
-#include "src/rules.h"
+#include "src/data.h"
 
 #include <limits.h>
 #include <getopt.h>
@@ -25,56 +23,26 @@ typedef void (*rule)(unsigned char* current, unsigned char* previous, size_t siz
 int main(int argc, char** argv) {
     /* =========== VARIABLES ========== */
 
-    /* Window appearing on the screen */
-    Window_t window = NULL;
-
-    /* Window rendering context */
-    Context_t context = NULL;
-
-    /* Window width. 480 by default */
-    int width = 480;
-
-    /* Window height. 480 by default */
-    int height = 480;
-
-    /* Grid controlling variable */
-    char is_grid = 0;
-
-    /* Cell size. 8 by default */
-    int cell_size = 8;
-
-    /* Number of steps every second */
-    float speed = 60;
-
-    /* Rule to apply */
-    int rule = -1;
-    
-    /* Random start initials */
-    int random_start_init = 0;
+    App app = {
+        .width = 480,
+        .height = 480,
+        .cell_size = 8,
+        .speed = 60,
+        .rule = -1,
+        .generation = 0,
+    };
 
     /* Current generation */
-    unsigned char* current = NULL;
+    unsigned char* current;
 
     /* Prvious generation */
-    unsigned char* previous = NULL;
-
-    /* Number of rows */
-    size_t rows;
-
-    /* Number of columns */
-    size_t columns;
-
-    /* A dynamically allocated 2D array */
-    unsigned char** grid = NULL;
-
+    unsigned char* previous;
 
     /* Program exit code */
     int result = EXIT_SUCCESS;
 
-
     /* SDL event happened */
     SDL_Event event;
-
 
     /* Main loop controlling variable */
     char quit = 0;
@@ -93,17 +61,8 @@ int main(int argc, char** argv) {
     /* Current command line option */
     int option;
 
-
-    /* Current generation */
-    int generation = 0;
-
-    /* Number of generations to produce */
-    int lifespan = 0;
-
-
     /* Coordinates of a cell to be displayed */
-    SDL_Rect cell = {0, 0, cell_size, cell_size};
-
+    SDL_Rect cell = {0, 0, app.cell_size, app.cell_size};
 
     extern char* optarg;
     extern int optind, opterr, optopt;
@@ -141,23 +100,23 @@ int main(int argc, char** argv) {
             case 0:
 
                 if (option_index == 0) {
-                    cell_size = (int) strtol(optarg, NULL, 10);
+                    app.cell_size = (int) strtol(optarg, NULL, 10);
                 }
                 else if (option_index == 1) {
-                    speed = (int) strtol(optarg, NULL, 10);
+                    app.speed = (int) strtol(optarg, NULL, 10);
 
-                    if (speed > 60) {
-                        speed = 60;
+                    if (app.speed > 60) {
+                        app.speed = 60;
                     }
                 }
                 else if (option_index == 2) {
-                    lifespan = (int) strtol(optarg, NULL, 10);
+                    app.lifespan = (int) strtol(optarg, NULL, 10);
                 }
                 else if (option_index == 3) {
-                    rule = (int) strtol(optarg, NULL, 10) % 255;
+                    app.rule = (int) strtol(optarg, NULL, 10) % 255;
                 }
                 else if (option_index == 4) {
-                    random_start_init = (int) strtol(optarg, NULL, 10);
+                    app.random_start_init = (int) strtol(optarg, NULL, 10);
                 }
                 else if (option_index == 5) {
                     print_usage_message(argv[0]);
@@ -169,19 +128,19 @@ int main(int argc, char** argv) {
 
             /* Turn on the grid */
             case 'g':
-                is_grid = !is_grid;
+                app.is_grid = !app.is_grid;
 
                 break ;
 
             /* Set window width */
             case 'x':
-                width = (int) strtol(optarg, NULL, 10);      
+                app.width = (int) strtol(optarg, NULL, 10);      
 
                 break ;
 
             /* Set a window height */
             case 'y':
-                height = (int) strtol(optarg, NULL, 10);
+                app.height = (int) strtol(optarg, NULL, 10);
 
                 break ;
 
@@ -212,28 +171,28 @@ int main(int argc, char** argv) {
     }
 
     /* Compute a new window width */
-    width = ((width % cell_size) == 0) ? width : width - (width % cell_size);
+    app.width = ((app.width % app.cell_size) == 0) ? app.width : app.width - (app.width % app.cell_size);
 
     /* Compute a new window height */
-    height = ((height % cell_size) == 0) ? height : height - (height % cell_size);
+    app.height = ((app.height % app.cell_size) == 0) ? app.height : app.height - (app.height % app.cell_size);
 
 
 
     /* ================ Dynamically allocate a 2D array ================ */
 
     /* Compute the number of rows */
-    rows = height / cell_size;
+    app.rows = app.height / app.cell_size;
 
     /* Compute the number of columns */
-    columns = width / cell_size;
+    app.columns = app.width / app.cell_size;
 
 
-    grid = (unsigned char**) malloc(sizeof(unsigned char*) * rows);
+    app.grid = (unsigned char**) malloc(sizeof(unsigned char*) * app.rows);
 
-    for (i = 0; i < rows; i++) {
-        grid[i] = (char*) malloc(sizeof(unsigned char*) * columns);
+    for (i = 0; i < app.rows; i++) {
+        app.grid[i] = (char*) malloc(sizeof(unsigned char*) * app.columns);
 
-        memset(grid[i], 0, sizeof(unsigned char*) * columns);
+        memset(app.grid[i], 0, sizeof(unsigned char*) * app.columns);
     }
 
     i = 0;
@@ -241,40 +200,40 @@ int main(int argc, char** argv) {
     /* ================================================================= */
 
     /* Update a cell */
-    cell.w = cell.h = cell_size;
+    cell.w = cell.h = app.cell_size;
 
     /* Update time interval */
-    speed = (1000. / speed) / 1000.;
+    app.speed = (1000. / app.speed) / 1000.;
 
     /* Update a new lifespan */
-    lifespan = (lifespan == 0) ? height / cell_size : lifespan;
+    app.lifespan = (app.lifespan == 0) ? app.height / app.cell_size : app.lifespan;
 
 
     /* Random number generator initialization */
     srand((unsigned) time(&t));
 
-    if (random_start_init) {
+    if (app.random_start_init) {
 
-        for (i = 0; i < random_start_init; i++) {
-            grid[0][rand() % columns] = 1;
+        for (i = 0; i < app.random_start_init; i++) {
+            app.grid[0][rand() % app.columns] = 1;
         }
     }
     else {
-        grid[0][columns / 2] = 1;
+        app.grid[0][app.columns / 2] = 1;
     }
 
     i = 0;
 
-    rule = (rule == -1) ? rand() % 9 : rule;
+    app.rule = (app.rule == -1) ? rand() % 255 : app.rule;
 
     /* ================================ */
 
     if (SDL_Init(SDL_INIT_EVENTS | SDL_INIT_VIDEO) == 0) {
 
-        if ((window = Window_create("anks-ca", width, height, SDL_WINDOW_SHOWN, RENDERER, SDL_RENDERER_ACCELERATED)) != NULL) {
+        if ((app.window = Window_create("anks-ca", app.width, app.height, SDL_WINDOW_SHOWN, RENDERER, SDL_RENDERER_ACCELERATED)) != NULL) {
 
             /* Get a window context */
-            context = Window_get_context(window);
+            app.context = Window_get_context(app.window);
 
             /* ================================ */
             
@@ -298,28 +257,28 @@ int main(int argc, char** argv) {
                 Global_set_color(0xff, 0xff, 0xff, 0xff);
 
                 /* Fill the window with white */
-                Window_clear(window);
+                Window_clear(app.window);
 
                 /* Set color to black */
                 Global_set_color(0x00, 0x00, 0x00, 0xff);
 
                 /* Display a grid if specified */
-                if (is_grid) {
-                    Window_display_grid(window, cell_size);
+                if (app.is_grid) {
+                    Window_display_grid(app.window, app.cell_size);
                 }
                 
 
 
                 /* ============== Display a cellular automaton ============== */
 
-                for (r = 0; r < rows; r++) {
+                for (r = 0; r < app.rows; r++) {
 
-                    for (c = 0; c < columns; c++) {
+                    for (c = 0; c < app.columns; c++) {
 
-                        if (grid[r][c]) {
+                        if (app.grid[r][c]) {
 
-                            cell.x = c * cell_size * 1;
-                            cell.y = r * cell_size * 1;
+                            cell.x = c * app.cell_size * 1;
+                            cell.y = r * app.cell_size * 1;
 
                             Rect_fill(&cell);
                         }
@@ -330,24 +289,24 @@ int main(int argc, char** argv) {
                 
                 /* ============== Update a cellular automaton =============== */
 
-                if (generation < lifespan - 1) {
+                if (app.generation < app.lifespan - 1) {
 
-                    if (delta >= speed) {
+                    if (delta >= app.speed) {
 
                         delta = 0;
 
-                        generation++;
+                        app.generation++;
 
-                        current = grid[generation];
-                        previous = grid[generation - 1];
+                        current = app.grid[app.generation];
+                        previous = app.grid[app.generation - 1];
                         
                         /* Apply a rule */
-                        apply_CA_rule_N(current, previous, columns, rule);
+                        apply_CA_rule_N(current, previous, app.columns, app.rule);
                     }
                 }
                 
                 /* Update the screen */
-                Window_update(window);
+                Window_update(app.window);
 
                 delta += (SDL_GetTicks64() - start) / 1000.0f;
             } 
@@ -364,13 +323,10 @@ int main(int argc, char** argv) {
 
 
 
-    Window_destroy(&window);
+    Window_destroy(&app.window);
     SDL_Quit();
 
-    free(current);
-    free(previous);
-
-    free(grid);
+    free(app.grid);
 
     /* ================================ */
 
