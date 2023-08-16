@@ -1,8 +1,7 @@
 #ifndef RULES_H
 #define RULES_H
 
-#include <stdlib.h>
-#include <sys/types.h>
+#include "data.h"
 
 /* ================================================================ */
 
