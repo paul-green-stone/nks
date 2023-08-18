@@ -2,7 +2,7 @@
 
 /* ================================================================ */
 
-void apply_CA_rule_N(unsigned char* current, unsigned char* previous, size_t size, unsigned char rule) {
+void apply_2E_CA(unsigned char* current, unsigned char* previous, size_t size, unsigned char rule) {
     /* =========== VARIABLES ========== */
 
     /* Loop variable */
@@ -47,4 +47,33 @@ void apply_CA_rule_N(unsigned char* current, unsigned char* previous, size_t siz
 
     return ;
 
+}
+
+/* ================================================================ */
+
+void apply_3T_CA(unsigned char* current, unsigned char* previous, size_t size, const unsigned char* rule) {
+    /* =========== VARIABLES ========== */
+
+    ssize_t i = 0;
+
+    unsigned char left, middle, right;
+
+    unsigned char total = 0;
+
+    /* ================================ */
+
+    for (; i < size; i ++) {
+
+        left = ((i - 1) < 0) ? previous[size - 1] : previous[i - 1];
+        middle = previous[i];
+        right = ((i + 1) >= size) ? previous[0] : previous[i + 1];
+
+        total = left + middle + right;
+
+        current[i] = rule[total] - '0';
+    }
+
+    /* ================================ */
+
+    return ;
 }

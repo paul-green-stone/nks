@@ -1,4 +1,6 @@
-#include "src/data.h"
+#include "src/types.h"
+#include "src/rules.h"
+#include "src/helpers.h"
 
 #include <limits.h>
 #include <getopt.h>
@@ -8,12 +10,6 @@
 /* ================================ */
 
 #define OPTSTRING ":x:y:g"
-
-/* ================================ */
-
-void swap(char* a, char* b, size_t size);
-
-void print_usage_message(const char* caller_name);
 
 /* ================================ */
 
@@ -30,6 +26,8 @@ int main(int argc, char** argv) {
         .speed = 60,
         .rule = -1,
         .generation = 0,
+        .random_start_init = 0,
+        .type = ELEMENTARY,
     };
 
     /* Current generation */
@@ -67,11 +65,20 @@ int main(int argc, char** argv) {
     extern char* optarg;
     extern int optind, opterr, optopt;
 
+    unsigned char* rule = NULL;
+
+    float interval;
+
     /* ================================ */
 
 
 
+    /* ================== Command line parsing ================== */
     while (1) {
+
+        /* ========================================================== */
+        /* ============= Parameters the program accepts ============= */
+        /* ========================================================== */
 
         static struct option options[] = {
             {"cell", required_argument, NULL, 0},           /* Cell size */
@@ -80,6 +87,7 @@ int main(int argc, char** argv) {
             {"rule", required_argument, NULL, 0},           /* Rule to apply */
             {"start", required_argument, NULL, 0},          /* Number of start initials */
             {"help", no_argument, NULL, 0},
+            {"type", required_argument, NULL, 0},           /* One of the values of CA variations */
             {NULL, 0, NULL, 0},
         };
 
@@ -113,7 +121,7 @@ int main(int argc, char** argv) {
                     app.lifespan = (int) strtol(optarg, NULL, 10);
                 }
                 else if (option_index == 3) {
-                    app.rule = (int) strtol(optarg, NULL, 10) % 255;
+                    app.rule = (int) strtol(optarg, NULL, 10);
                 }
                 else if (option_index == 4) {
                     app.random_start_init = (int) strtol(optarg, NULL, 10);
@@ -122,6 +130,10 @@ int main(int argc, char** argv) {
                     print_usage_message(argv[0]);
 
                     return result;
+                }
+                /* Set a CA type */
+                else if (option_index == 6) {
+                    app.type = (int) strtol(optarg, NULL, 10);
                 }
 
                 break ;
@@ -170,6 +182,10 @@ int main(int argc, char** argv) {
         }
     }
 
+    /* ========================================================== */
+
+
+
     /* Compute a new window width */
     app.width = ((app.width % app.cell_size) == 0) ? app.width : app.width - (app.width % app.cell_size);
 
@@ -178,7 +194,9 @@ int main(int argc, char** argv) {
 
 
 
-    /* ================ Dynamically allocate a 2D array ================ */
+    /* ========================================================== */
+    /* ============= Dynamically allocate 2D array ============== */
+    /* ========================================================== */
 
     /* Compute the number of rows */
     app.rows = app.height / app.cell_size;
@@ -203,30 +221,59 @@ int main(int argc, char** argv) {
     cell.w = cell.h = app.cell_size;
 
     /* Update time interval */
-    app.speed = (1000. / app.speed) / 1000.;
+    interval = (1000. / app.speed) / 1000.;
 
     /* Update a new lifespan */
     app.lifespan = (app.lifespan == 0) ? app.height / app.cell_size : app.lifespan;
 
 
+
+    /* ========================================================== */
+    /* ================= Set initial conditions ================= */
+    /* ========================================================== */
+
     /* Random number generator initialization */
     srand((unsigned) time(&t));
 
-    if (app.random_start_init) {
+    if (app.random_start_init > 0) {
 
         for (i = 0; i < app.random_start_init; i++) {
+
+            /* ==== All initial values are placed in the first generation ==== */
             app.grid[0][rand() % app.columns] = 1;
         }
     }
     else {
-        app.grid[0][app.columns / 2] = 1;
+
+        /* Both ELEMENTARY and TOTALISTIC3 CA starts with the cell of 1 in the middle of an array */
+        if ((app.type == ELEMENTARY) || (app.type == TOTALISTIC3)) {
+            app.grid[0][app.columns / 2] = 1;
+        }
+    }
+
+    if (app.type == ELEMENTARY) {
+        app.rule = (app.rule == -1) ? rand() % 255 : app.rule % 255;
+    }
+    else if (app.type == TOTALISTIC3) {
+
+        /* App stores an integer version of the specified rule */
+        app.rule = (app.rule == -1) ? rand() % 2187 : app.rule;
+
+        /* Convert a decimal number into a ternary one (base 3 number). It is stored in reversed order */
+        rule = d2t(app.rule);
     }
 
     i = 0;
 
-    app.rule = (app.rule == -1) ? rand() % 255 : app.rule;
-
     /* ================================ */
+
+
+
+    /* ========================================================== */
+    /* ================== Main things go here =================== */
+    /* ========================================================== */
+
+    App_info(&app);
 
     if (SDL_Init(SDL_INIT_EVENTS | SDL_INIT_VIDEO) == 0) {
 
@@ -241,6 +288,12 @@ int main(int argc, char** argv) {
 
                 start = SDL_GetTicks64();
 
+
+
+                /* ========================================================== */
+                /* ====================== Handle input ====================== */
+                /* ========================================================== */
+
                 while (SDL_PollEvent(&event) > 0) {
 
                     switch (event.type) {
@@ -251,25 +304,31 @@ int main(int argc, char** argv) {
                     }
                 }
 
+
+
+                /* ========================================================== */
                 /* =================== Render starts here =================== */
+                /* ========================================================== */
                 
-                /* Set color to white */
+                /* =================== Set color to white =================== */
                 Global_set_color(0xff, 0xff, 0xff, 0xff);
 
-                /* Fill the window with white */
+                /* =============== Fill the window with white =============== */
                 Window_clear(app.window);
 
-                /* Set color to black */
+                /* =================== Set color to black =================== */
                 Global_set_color(0x00, 0x00, 0x00, 0xff);
 
-                /* Display a grid if specified */
+                /* ============== Display a grid if specified =============== */
                 if (app.is_grid) {
                     Window_display_grid(app.window, app.cell_size);
                 }
                 
 
 
+                /* ========================================================== */
                 /* ============== Display a cellular automaton ============== */
+                /* ========================================================== */
 
                 for (r = 0; r < app.rows; r++) {
 
@@ -280,18 +339,25 @@ int main(int argc, char** argv) {
                             cell.x = c * app.cell_size * 1;
                             cell.y = r * app.cell_size * 1;
 
+                            if (app.type == TOTALISTIC3) {
+
+                                (app.grid[r][c] == 1) ? Global_set_color(255 / 2, 255 / 2, 255 / 2, 255) : (app.grid[r][c] == 2) ? Global_set_color(0x00, 0x00, 0x00, 0xff) : Global_set_color(0xff, 0xff, 0xff, 0xff);
+                            }
+
                             Rect_fill(&cell);
                         }
                     }
                 }
 
 
-                
+
+                /* ========================================================== */
                 /* ============== Update a cellular automaton =============== */
+                /* ========================================================== */
 
                 if (app.generation < app.lifespan - 1) {
 
-                    if (delta >= app.speed) {
+                    if (delta >= interval) {
 
                         delta = 0;
 
@@ -301,11 +367,13 @@ int main(int argc, char** argv) {
                         previous = app.grid[app.generation - 1];
                         
                         /* Apply a rule */
-                        apply_CA_rule_N(current, previous, app.columns, app.rule);
+                        (app.type == TOTALISTIC3) ? apply_3T_CA(current, previous, app.columns, rule) : apply_2E_CA(current, previous, app.columns, app.rule);
                     }
                 }
+
                 
-                /* Update the screen */
+                
+                /* =================== Update the screen ==================== */
                 Window_update(app.window);
 
                 delta += (SDL_GetTicks64() - start) / 1000.0f;
@@ -323,36 +391,18 @@ int main(int argc, char** argv) {
 
 
 
+    /* ========================================================== */
+    /* ============= Destroy whatever was allocated ============= */
+    /* ========================================================== */
+
     Window_destroy(&app.window);
-    SDL_Quit();
 
     free(app.grid);
+    free(rule);
+
+    SDL_Quit();
 
     /* ================================ */
 
     return result;
-}
-
-/* ================================================================ */
-
-void swap(char* a, char* b, size_t size) {
-    char temp;
-
-    for (int i = 0; i < size; i++) {
-        temp = a[i];
-
-        a[i] = b[i];
-        b[i] = temp;
-    }
-
-    return ;
-}
-
-/* ================================ */
-
-void print_usage_message(const char* caller_name) {
-
-    fprintf(stderr, "usage: %s [-xyg] [--cell=<size>] [--speed=<number of steps in a second>] [--lifespan=<number>] [--rule=<CA rule>] [--start=<number>] [--help]\n", caller_name);
-
-    return ;
 }
