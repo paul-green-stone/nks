@@ -1,12 +1,13 @@
 cc := gcc
+bin := anks-ca
 
 OBJDIR := objects
 CFLAGS := -g -O1 -fpic
 
 LDFLAGS := -lSDL2 -lSDL2_image -lm
 
-$(OBJDIR)/main.o: main.c $(OBJDIR)/rules.o $(OBJDIR)/helpers.o ps-sdl-wrapper/libps.a
-	$(cc) $(CFLAGS) -o a.out $^ $(LDFLAGS)
+$(OBJDIR)/main.o: main.c $(OBJDIR)/rules.o $(OBJDIR)/utils.o ps-sdl-wrapper/libps.a
+	$(cc) $(CFLAGS) -o $(bin) $^ $(LDFLAGS)
 
 ps-sdl-wrapper/libps.a:
 	$(MAKE) -C ps-sdl-wrapper
@@ -14,7 +15,7 @@ ps-sdl-wrapper/libps.a:
 $(OBJDIR)/rules.o: src/rules.c
 	$(cc) -c $(CFLAGS) -o $@ $^
 
-$(OBJDIR)/helpers.o: src/helpers.c
+$(OBJDIR)/utils.o: src/utils.c
 	$(cc) -c $(CFLAGS) -o $@ $^
 
 # ================================================================ #
@@ -22,7 +23,7 @@ $(OBJDIR)/helpers.o: src/helpers.c
 .PHONY: clean
 
 clean:
-	rm -rf $(OBJDIR) ./*.a ./*.o ./*.out
+	rm -rf $(bin) $(OBJDIR) ./*.a ./*.o ./*.out
 
 # ================================ #
 

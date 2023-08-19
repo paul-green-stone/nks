@@ -1,6 +1,6 @@
 #include "src/types.h"
 #include "src/rules.h"
-#include "src/helpers.h"
+#include "src/utils.h"
 
 #include <limits.h>
 #include <getopt.h>
@@ -9,7 +9,7 @@
 
 /* ================================ */
 
-#define OPTSTRING ":x:y:g"
+#define OPTSTRING ":x:y:gh"
 
 /* ================================ */
 
@@ -109,11 +109,16 @@ int main(int argc, char** argv) {
 
                 if (option_index == 0) {
                     app.cell_size = (int) strtol(optarg, NULL, 10);
+
+                    /* ========== Check for validity of the cell size =========== */
+                    if (app.cell_size < 1) {
+                        app.cell_size = 2;
+                    }
                 }
                 else if (option_index == 1) {
                     app.speed = (int) strtol(optarg, NULL, 10);
 
-                    if (app.speed > 60) {
+                    if ((app.speed > 60) || (app.speed < 1)) {
                         app.speed = 60;
                     }
                 }
@@ -134,6 +139,16 @@ int main(int argc, char** argv) {
                 /* Set a CA type */
                 else if (option_index == 6) {
                     app.type = (int) strtol(optarg, NULL, 10);
+
+                    /* ======== Check for validity of the specified type ======== */
+                    if ((app.type < 0) || (app.type > 1)) {
+
+                        fprintf(stderr, "Unknown CA type\n");
+
+                        print_usage_message(argv[0]);
+
+                        return EXIT_FAILURE;
+                    }
                 }
 
                 break ;
@@ -195,7 +210,7 @@ int main(int argc, char** argv) {
 
 
     /* ========================================================== */
-    /* ============= Dynamically allocate 2D array ============== */
+    /* ============ Dynamically allocate a 2D array ============= */
     /* ========================================================== */
 
     /* Compute the number of rows */
@@ -229,10 +244,10 @@ int main(int argc, char** argv) {
 
 
     /* ========================================================== */
-    /* ================= Set initial conditions ================= */
+    /* =============== Setting initial conditions =============== */
     /* ========================================================== */
 
-    /* Random number generator initialization */
+    /* ========= Random number generator initialization ========= */
     srand((unsigned) time(&t));
 
     if (app.random_start_init > 0) {
@@ -245,11 +260,15 @@ int main(int argc, char** argv) {
     }
     else {
 
-        /* Both ELEMENTARY and TOTALISTIC3 CA starts with the cell of 1 in the middle of an array */
+        /* Both ELEMENTARY and TOTALISTIC3 CA start with the cell of 1 in the middle of an array */
         if ((app.type == ELEMENTARY) || (app.type == TOTALISTIC3)) {
             app.grid[0][app.columns / 2] = 1;
         }
     }
+
+    /* ========================================================== */
+    /* ========== Rules are randomized if not specified ========= */
+    /* ========================================================== */
 
     if (app.type == ELEMENTARY) {
         app.rule = (app.rule == -1) ? rand() % 255 : app.rule % 255;
@@ -265,7 +284,7 @@ int main(int argc, char** argv) {
 
     i = 0;
 
-    /* ================================ */
+    /* ================================================================ */
 
 
 
@@ -273,6 +292,7 @@ int main(int argc, char** argv) {
     /* ================== Main things go here =================== */
     /* ========================================================== */
 
+    /* ===== Displaying info about CA that's being explored ===== */
     App_info(&app);
 
     if (SDL_Init(SDL_INIT_EVENTS | SDL_INIT_VIDEO) == 0) {
@@ -397,7 +417,11 @@ int main(int argc, char** argv) {
 
     Window_destroy(&app.window);
 
+    for (i = 0; i < app.rows; i++) {
+        free(app.grid[i]);
+    }
     free(app.grid);
+
     free(rule);
 
     SDL_Quit();
