@@ -1,6 +1,6 @@
-# anks-ca
+# nks
 
-A new kind of Science - cellular automata (CA). Inpired by Steven Wolfram's book *A New Kind of Science*
+A **New Kind of Science** - cellular automata (CA). Inpired by Steven Wolfram's book *A New Kind of Science*
 
 **Note: This project is currently in development, and there may be bugs. Please use with caution and report any issues you encounter.**
 
@@ -21,7 +21,7 @@ This program is designed to simulate and visualize cellular automata. Cellular a
 
 ## Features
 
-The *anks-ca* program offers the following features:
+The *nks* program offers the following features:
 
 * **Cellular Automata Simulations**: The program allows you to simulate various types of cellular automata, each governed by different rules and behaviors.
 
@@ -31,28 +31,28 @@ The *anks-ca* program offers the following features:
 
 ## Installation
 
-To use the `anks-ca`, follow these steps:
+To use the `nks`, follow these steps:
 
 1. **Download**: Download and install [SDL2](https://www.libsdl.org/) library.
-2. **Download**. Download and install `anks-ca`:
-   1. Open your terminal or command prompt.
-   2. Navigate to the directory where you want to clone the repository.
-   3. Type the following command to clone the repository: `git clone https://github.com/paul-green-stone/anks-ca.git`.
-   4. Wait for the repository to be cloned to your local machine.
-   5. Once the cloning process is complete, you can navigate to the cloned repository directory and start working on it.
+2. **Download**. Download and install `nks`:
+   * Open your terminal or command prompt.
+   * Navigate to the directory where you want to clone the repository.
+   * Type the following command to clone the repository: `git clone https://github.com/paul-green-stone/nks.git`.
+   * Wait for the repository to be cloned to your local machine.
+   * Once the cloning process is complete, you can navigate to the cloned repository directory and start working on it.
 3. **Update**. Initialize and update all dependencies:
-   1. Open your terminal or command prompt.
-   2. Navigate to the directory where you have cloned the `https://github.com/paul-green-stone/anks-ca.git` repository.
-   3. Type the following command to initialize the submodule: `git submodule init`.
-   4. Wait for the submodule to be initialized.
-   5. Once the initialization process is complete, type the following command to update the submodule: `git submodule update`.
-   6. Once the update process is complete, you can navigate to the submodule directory and start working on it.
-4. **Run**: Invoke `anks-ca -h` command for further instructions.
+   * Open your terminal or command prompt.
+   * Navigate to the directory where you have cloned the `https://github.com/paul-green-stone/nks.git` repository.
+   * Type the following command to initialize the submodule: `git submodule init`.
+   * Wait for the submodule to be initialized.
+   * Once the initialization process is complete, type the following command to update the submodule: `git submodule update`.
+   * Once the update process is complete, you can navigate to the submodule directory and start working on it.
+4. **Run**: Invoke `nks -h` command for further instructions.
 
 
 ## Usage
 
-Once the `anks-cs` is installed, you can use it to display and simulate different rules of cellular automata. Here are the general steps to use the program:
+Once the `nks` is installed, you can use it to display and simulate different rules of cellular automata. Here are the general steps to use the program:
 
 1. **Configure**: Set up the initial state, rules, and parameters of the cellular automata simulation. This may involve specifying the lattice structure, neighborhood type, and the specific rule to be applied.
 
@@ -64,7 +64,7 @@ Once the `anks-cs` is installed, you can use it to display and simulate differen
 
 ## Examples
 
-To help you get started, here are a few examples of cellular automata simulations you can try with the *anks-ca*:
+To help you get started, here are a few examples of cellular automata simulations you can try with the *nks*:
 
 1. **Elementary**. A type of one-dimensional cellular automaton that consists of a row of cells, each of which can be in one of two states (0 or 1). The automaton evolves over time according to a set of rules that determine the state of each cell based on its current state and the states of its two neighbors. There are 256 possible elementary automaton rules, each of which can be represented by an 8-bit binary number.
 2. **Totalistic3**. A type of cellular automaton where the new color of each cell depends only on the average color of its neighboring cells, rather than their individual colors. There are 2187 possible totalistic rules for a `TOTALISTIC3` (*r = 3*) automaton, each of which can be identified by a code number. The specific behavior and patterns of the automaton depend on the chosen rule and initial conditions.
@@ -81,4 +81,4 @@ Something interesting will be here soon.
 
 ## Conclusion
 
-The *anks-ca* provides a platform for displaying and simulating different rules of cellular automata. By exploring various initial states and rules, you can observe the emergence of complex patterns and behaviors. Use this *README* as a guide to install, use, and experiment with the program. Enjoy exploring the fascinating world of cellular automata!
+The *nks* provides a platform for displaying and simulating different rules of cellular automata. By exploring various initial states and rules, you can observe the emergence of complex patterns and behaviors. Use this *README* as a guide to install, use, and experiment with the program. Enjoy exploring the fascinating world of cellular automata!

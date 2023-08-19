@@ -55,4 +55,4 @@ dkms.conf
 .vscode/
 
 # Ignore the binary
-anks-ca
+nks

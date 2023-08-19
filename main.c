@@ -297,7 +297,7 @@ int main(int argc, char** argv) {
 
     if (SDL_Init(SDL_INIT_EVENTS | SDL_INIT_VIDEO) == 0) {
 
-        if ((app.window = Window_create("anks-ca", app.width, app.height, SDL_WINDOW_SHOWN, RENDERER, SDL_RENDERER_ACCELERATED)) != NULL) {
+        if ((app.window = Window_create("anks-ca", app.width, app.height, SDL_WINDOW_SHOWN, SURFACE, SDL_RENDERER_ACCELERATED)) != NULL) {
 
             /* Get a window context */
             app.context = Window_get_context(app.window);
@@ -361,7 +361,7 @@ int main(int argc, char** argv) {
 
                             if (app.type == TOTALISTIC3) {
 
-                                (app.grid[r][c] == 1) ? Global_set_color(255 / 2, 255 / 2, 255 / 2, 255) : (app.grid[r][c] == 2) ? Global_set_color(0x00, 0x00, 0x00, 0xff) : Global_set_color(0xff, 0xff, 0xff, 0xff);
+                                (app.grid[r][c] == 1) ? Global_set_color(255, 0, 0, 255) : (app.grid[r][c] == 2) ? Global_set_color(0x00, 0x00, 0x00, 0xff) : Global_set_color(0xff, 0xff, 0xff, 0xff);
                             }
 
                             Rect_fill(&cell);

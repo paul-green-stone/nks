@@ -1,4 +1,4 @@
-#include "helpers.h"
+#include "utils.h"
 
 #include <strings.h>
 
@@ -13,8 +13,6 @@ unsigned char* d2t(size_t number) {
 
     /* Remainder */
     int r;
-
-    printf("%d\n", number);
 
     /* ================================ */
 

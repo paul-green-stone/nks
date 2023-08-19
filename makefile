@@ -1,5 +1,5 @@
 cc := gcc
-bin := anks-ca
+bin := nks
 
 OBJDIR := objects
 CFLAGS := -g -O1 -fpic

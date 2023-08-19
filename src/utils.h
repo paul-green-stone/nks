@@ -1,5 +1,5 @@
-#ifndef HELPERS_H
-#define HELPERS_H
+#ifndef UTILS_H
+#define UTILS_H
 
 #include "types.h"
 
@@ -43,4 +43,4 @@ void App_info(struct __application* app);
 
 /* ================================================================ */
 
-#endif /* HELPERS_H */
+#endif /* UTILS_H */
