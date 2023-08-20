@@ -64,7 +64,7 @@ void swap(char* a, char* b, size_t size) {
 
 void print_usage_message(const char* caller_name) {
 
-    fprintf(stdout, "usage: %s [options]\n", caller_name);
+    fprintf(stdout, "usage: %s [options] output\n", caller_name);
 
     fprintf(stdout, "\nOptions:\n");
 

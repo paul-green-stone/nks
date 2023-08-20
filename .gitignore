@@ -56,3 +56,6 @@ dkms.conf
 
 # Ignore the binary
 nks
+
+# Images
+*.png

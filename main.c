@@ -6,6 +6,7 @@
 #include <getopt.h>
 #include <stdlib.h>
 #include <time.h>
+#include <strings.h>
 
 /* ================================ */
 
@@ -68,6 +69,9 @@ int main(int argc, char** argv) {
     unsigned char* rule = NULL;
 
     float interval;
+
+    /* Name for the output image */
+    char filename [FILENAME_SIZE];
 
     /* ================================ */
 
@@ -197,6 +201,19 @@ int main(int argc, char** argv) {
         }
     }
 
+    /* ============= Handling non-option arguments ============== */
+    if (optind < argc) {
+
+        /* Only the first non-option arguments are handled now */
+        while (optind < argc) {
+            strncpy(filename, argv[optind], FILENAME_SIZE);
+
+            strncat(filename, ".png", 5);
+
+            break ;
+        }
+    }
+
     /* ========================================================== */
 
 
@@ -295,7 +312,7 @@ int main(int argc, char** argv) {
     /* ===== Displaying info about CA that's being explored ===== */
     App_info(&app);
 
-    if (SDL_Init(SDL_INIT_EVENTS | SDL_INIT_VIDEO) == 0) {
+    if ((SDL_Init(SDL_INIT_EVENTS | SDL_INIT_VIDEO) == 0) && (IMG_Init(IMG_INIT_PNG) == IMG_INIT_PNG)) {
 
         if ((app.window = Window_create("nks", app.width, app.height, SDL_WINDOW_SHOWN, SURFACE, SDL_RENDERER_ACCELERATED)) != NULL) {
 
@@ -412,6 +429,19 @@ int main(int argc, char** argv) {
 
 
     /* ========================================================== */
+    /* ==================== Saving an image ===================== */
+    /* ========================================================== */
+
+    if ((filename != NULL) && (Window_get_context_type(app.window) == SURFACE)) {
+
+        if (IMG_SavePNG((SDL_Surface*) app.context, filename) == -1) {
+            warn_with_sys_msg(IMG_GetError());
+        }
+    }
+
+
+
+    /* ========================================================== */
     /* ============= Destroy whatever was allocated ============= */
     /* ========================================================== */
 
@@ -424,6 +454,7 @@ int main(int argc, char** argv) {
 
     free(rule);
 
+    IMG_Quit();
     SDL_Quit();
 
     /* ================================ */
