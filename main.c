@@ -297,7 +297,7 @@ int main(int argc, char** argv) {
 
     if (SDL_Init(SDL_INIT_EVENTS | SDL_INIT_VIDEO) == 0) {
 
-        if ((app.window = Window_create("anks-ca", app.width, app.height, SDL_WINDOW_SHOWN, SURFACE, SDL_RENDERER_ACCELERATED)) != NULL) {
+        if ((app.window = Window_create("nks", app.width, app.height, SDL_WINDOW_SHOWN, SURFACE, SDL_RENDERER_ACCELERATED)) != NULL) {
 
             /* Get a window context */
             app.context = Window_get_context(app.window);

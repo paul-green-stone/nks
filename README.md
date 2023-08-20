@@ -49,7 +49,6 @@ To use the `nks`, follow these steps:
    * Once the update process is complete, you can navigate to the submodule directory and start working on it.
 4. **Run**: Invoke `nks -h` command for further instructions.
 
-
 ## Usage
 
 Once the `nks` is installed, you can use it to display and simulate different rules of cellular automata. Here are the general steps to use the program:
