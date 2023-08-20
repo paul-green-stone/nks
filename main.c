@@ -343,7 +343,7 @@ int main(int argc, char** argv) {
                 if (app.is_grid) {
                     Window_display_grid(app.window, app.cell_size);
                 }
-                
+
 
 
                 /* ========================================================== */

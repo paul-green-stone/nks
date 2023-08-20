@@ -18,6 +18,8 @@ unsigned char* d2t(size_t number) {
 
     if ((rule = (unsigned char*) malloc(sizeof(char) * TCA3_SIZE)) != NULL) {
 
+        memset(rule, 0, TCA3_SIZE);
+
         for (; number > 0; i++) {
 
             /* Value to put in the array */
@@ -26,6 +28,10 @@ unsigned char* d2t(size_t number) {
             number /= 3;
 
             rule[i] = r + '0';
+        }
+
+        for (; i < TCA3_SIZE; i++) {
+            rule[i] = '0';
         }
 
         rule[TCA3_SIZE] = '\0';
