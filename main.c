@@ -52,10 +52,10 @@ int main(int argc, char** argv) {
     time_t t;
 
     /* Loop variable */
-    size_t i = 0;
+    ssize_t i = 0;
 
     /* Row and columns */
-    size_t r = 0, c = 0;
+    ssize_t r = 0, c = 0;
 
     /* Current command line option */
     int option;
@@ -206,7 +206,7 @@ int main(int argc, char** argv) {
 
         /* Only the first non-option arguments are handled now */
         while (optind < argc) {
-            strncpy(filename, argv[optind], FILENAME_SIZE);
+            strncpy(filename, argv[optind], FILENAME_SIZE - 1);
 
             strncat(filename, ".png", 5);
 
@@ -240,7 +240,7 @@ int main(int argc, char** argv) {
     app.grid = (unsigned char**) malloc(sizeof(unsigned char*) * app.rows);
 
     for (i = 0; i < app.rows; i++) {
-        app.grid[i] = (char*) malloc(sizeof(unsigned char*) * app.columns);
+        app.grid[i] = (unsigned char*) malloc(sizeof(unsigned char*) * app.columns);
 
         memset(app.grid[i], 0, sizeof(unsigned char*) * app.columns);
     }
@@ -432,7 +432,7 @@ int main(int argc, char** argv) {
     /* ==================== Saving an image ===================== */
     /* ========================================================== */
 
-    if ((filename != NULL) && (Window_get_context_type(app.window) == SURFACE)) {
+    if ((strlen(filename) > 0) && (Window_get_context_type(app.window) == SURFACE)) {
 
         if (IMG_SavePNG((SDL_Surface*) app.context, filename) == -1) {
             warn_with_sys_msg(IMG_GetError());

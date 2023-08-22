@@ -30,11 +30,11 @@ unsigned char* d2t(size_t number) {
             rule[i] = r + '0';
         }
 
-        for (; i < TCA3_SIZE; i++) {
+        for (; i < TCA3_SIZE - 1; i++) {
             rule[i] = '0';
         }
 
-        rule[TCA3_SIZE] = '\0';
+        rule[TCA3_SIZE - 1] = '\0';
     }
     else {
         warn_with_sys_msg(__func__);
@@ -48,9 +48,13 @@ unsigned char* d2t(size_t number) {
 /* ================================================================ */
 
 void swap(char* a, char* b, size_t size) {
+    /* =========== VARIABLES ========== */
+
     char temp;
 
-    for (int i = 0; i < size; i++) {
+    size_t i = 0;
+
+    for (; i < size; i++) {
         temp = a[i];
 
         a[i] = b[i];
@@ -107,7 +111,7 @@ void App_info(struct __application* app) {
     /* Padding to center the text */
     int padding;
 
-    char* type;
+    char* type = NULL;
 
     if (app != NULL) {
 
@@ -146,11 +150,11 @@ void App_info(struct __application* app) {
     fprintf(stdout, "   %-29s:%29d\n", "rule", app->rule);
     fprintf(stdout, "   %-29s:%29s\n", "grid", (app->is_grid) ? "on" : "off");
     fprintf(stdout, "   %-29s:%29d\n", "cell", app->cell_size);
-    fprintf(stdout, "   %-29s:%29d\n", "rows", app->rows);
-    fprintf(stdout, "   %-29s:%29d\n", "columns", app->columns);
+    fprintf(stdout, "   %-29s:%29ld\n", "rows", app->rows);
+    fprintf(stdout, "   %-29s:%29ld\n", "columns", app->columns);
     fprintf(stdout, "   %-29s:%29d\n", "speed", app->speed);
     fprintf(stdout, "   %-29s:%29d\n", "lifespan", app->lifespan);
-    fprintf(stdout, "   %-29s:%29d\n", "total", app->rows * app->columns);
+    fprintf(stdout, "   %-29s:%29ld\n", "total", app->rows * app->columns);
     
     fprintf(stdout, "   %-29s:%29s\n", "start", (app->random_start_init > 0) ? "on" : "off");
 

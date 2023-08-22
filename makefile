@@ -2,7 +2,7 @@ cc := gcc
 bin := nks
 
 OBJDIR := objects
-CFLAGS := -g -O1 -fpic
+CFLAGS := -g -O2 -fpic -Wall -Wextra
 
 LDFLAGS := -lSDL2 -lSDL2_image -lm
 

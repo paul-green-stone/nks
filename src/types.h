@@ -17,7 +17,7 @@
 /**
  * Totalistic cellular automaton with 3 colors. Buffer size
 */
-#define TCA3_SIZE 7
+#define TCA3_SIZE 8
 
 
 
@@ -60,10 +60,10 @@ typedef struct __application {
     char is_grid;
 
     /* Number of rows */
-    size_t rows;
+    ssize_t rows;
 
     /* Number of columns */
-    size_t columns;
+    ssize_t columns;
 
     /* Cell size */
     int cell_size;
