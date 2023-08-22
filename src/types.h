@@ -15,9 +15,9 @@
 #define FILENAME_SIZE 64
 
 /**
- * Totalistic cellular automaton with 3 colors. Buffer size
+ * The size of a buffer used to indicated the maximum number of digits in a number convered from a decimla system to a specified one
 */
-#define TCA3_SIZE 8
+#define BUFFER_SIZE 32
 
 
 

@@ -16,9 +16,9 @@ unsigned char* d2t(size_t number) {
 
     /* ================================ */
 
-    if ((rule = (unsigned char*) malloc(sizeof(char) * TCA3_SIZE)) != NULL) {
+    if ((rule = (unsigned char*) malloc(sizeof(char) * BUFFER_SIZE)) != NULL) {
 
-        memset(rule, 0, TCA3_SIZE);
+        memset(rule, 0, BUFFER_SIZE);
 
         for (; number > 0; i++) {
 
@@ -30,11 +30,11 @@ unsigned char* d2t(size_t number) {
             rule[i] = r + '0';
         }
 
-        for (; i < TCA3_SIZE - 1; i++) {
+        for (; i < BUFFER_SIZE; i++) {
             rule[i] = '0';
         }
 
-        rule[TCA3_SIZE - 1] = '\0';
+        rule[BUFFER_SIZE - 1] = '\0';
     }
     else {
         warn_with_sys_msg(__func__);

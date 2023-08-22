@@ -73,6 +73,22 @@ int main(int argc, char** argv) {
     /* Name for the output image */
     char filename [FILENAME_SIZE];
 
+    /* Color indices */
+    enum colors {
+        WHITE = 0,
+        RED = 1,
+        BLACK = 2,
+    };
+
+    /**
+     * Available colors
+    */
+    SDL_Color __colors[] = {
+        {0xff, 0xff, 0xff, 0xff}, /* White */
+        {0xff, 0x00, 0x00, 0xff}, /* Red */
+        {0x00, 0x00, 0x00, 0xff}, /* Black */
+    };
+
     /* ================================ */
 
 
@@ -378,7 +394,7 @@ int main(int argc, char** argv) {
 
                             if (app.type == TOTALISTIC3) {
 
-                                (app.grid[r][c] == 1) ? Global_set_color(255, 0, 0, 255) : (app.grid[r][c] == 2) ? Global_set_color(0x00, 0x00, 0x00, 0xff) : Global_set_color(0xff, 0xff, 0xff, 0xff);
+                                (app.grid[r][c] == 1) ? Global_set_SDL_Color(&__colors[RED]) : (app.grid[r][c] == 2) ? Global_set_SDL_Color(&__colors[BLACK]) : Global_set_SDL_Color(&__colors[WHITE]);
                             }
 
                             Rect_fill(&cell);
