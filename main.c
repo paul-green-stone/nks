@@ -14,9 +14,6 @@
 
 /* ================================ */
 
-/* Function pointer typedef */
-typedef void (*rule)(unsigned char* current, unsigned char* previous, size_t size);
-
 int main(int argc, char** argv) {
     /* =========== VARIABLES ========== */
 
@@ -26,9 +23,9 @@ int main(int argc, char** argv) {
         .cell_size = 8,
         .speed = 60,
         .rule = -1,
+        .mrule = -1,
         .generation = 0,
         .random_start_init = 0,
-        .type = ELEMENTARY,
     };
 
     /* Current generation */
@@ -66,6 +63,7 @@ int main(int argc, char** argv) {
     extern char* optarg;
     extern int optind, opterr, optopt;
 
+    /* If a rule must be converted to another base */
     unsigned char* rule = NULL;
 
     float interval;
@@ -108,6 +106,7 @@ int main(int argc, char** argv) {
             {"start", required_argument, NULL, 0},          /* Number of start initials */
             {"help", no_argument, NULL, 0},
             {"type", required_argument, NULL, 0},           /* One of the values of CA variations */
+            {"mrule", required_argument, NULL, 0},          /* Additional rule for a mobile automaton. It controlls the way an active cell should be placed */
             {NULL, 0, NULL, 0},
         };
 
@@ -161,14 +160,19 @@ int main(int argc, char** argv) {
                     app.type = (int) strtol(optarg, NULL, 10);
 
                     /* ======== Check for validity of the specified type ======== */
-                    if ((app.type < 0) || (app.type > 1)) {
+                    if ((app.type < 0) || (app.type > 2)) {
 
-                        fprintf(stderr, "Unknown CA type\n");
+                        fprintf(stderr, "\n");
+
+                        warn_with_user_msg(argv[0], "Unknown CA type\n");
 
                         print_usage_message(argv[0]);
 
                         return EXIT_FAILURE;
                     }
+                }
+                else if (option_index == 7) {
+                    app.mrule = (int) strtol(optarg, NULL, 10);
                 }
 
                 break ;
@@ -217,10 +221,28 @@ int main(int argc, char** argv) {
         }
     }
 
+
+
+    /* ========================================================== */
+    /* =========== --type can be specified at the end =========== */
+    /* ========================================================== */
+    
+    if ((app.mrule > -1) && (app.type != MOBILE_O)) {
+        fprintf(stderr, "\n");
+
+        warn_with_user_msg(argv[0], "--mrule requires MOBILE_O to be specified\n");
+
+        print_usage_message(argv[0]);
+
+        return EXIT_FAILURE;
+    }
+
+
+
     /* ============= Handling non-option arguments ============== */
     if (optind < argc) {
 
-        /* Only the first non-option arguments are handled now */
+        /* Only the first non-option argument is handled now */
         while (optind < argc) {
             strncpy(filename, argv[optind], FILENAME_SIZE - 1);
 
@@ -288,7 +310,15 @@ int main(int argc, char** argv) {
         for (i = 0; i < app.random_start_init; i++) {
 
             /* ==== All initial values are placed in the first generation ==== */
-            app.grid[0][rand() % app.columns] = 1;
+            if (app.type == ELEMENTARY) {
+                app.grid[0][rand() % app.columns] = 1;
+            }
+            else if (app.type == TOTALISTIC3) {
+                app.grid[0][rand() % app.columns] = 1;
+            }
+            else if (app.type == MOBILE_O) {
+                app.grid[0][rand() % app.columns] = rand() % (3 - 2 + 1) + 2;
+            }
         }
     }
     else {
@@ -296,6 +326,10 @@ int main(int argc, char** argv) {
         /* Both ELEMENTARY and TOTALISTIC3 CA start with the cell of 1 in the middle of an array */
         if ((app.type == ELEMENTARY) || (app.type == TOTALISTIC3)) {
             app.grid[0][app.columns / 2] = 1;
+        }
+        /* Active cell with white color */
+        else if (app.type == MOBILE_O) {
+            app.grid[0][app.columns / 2] = 2;
         }
     }
 
@@ -312,7 +346,11 @@ int main(int argc, char** argv) {
         app.rule = (app.rule == -1) ? rand() % 2187 : app.rule;
 
         /* Convert a decimal number into a ternary one (base 3 number). It is stored in reversed order */
-        rule = d2t(app.rule);
+        rule = d2B(app.rule, 3);
+    }
+    else if (app.type == MOBILE_O) {
+        app.rule = (app.rule == -1) ? rand() % 255 : app.rule % 255;
+        app.mrule = (app.mrule == -1) ? rand() % 255 : app.mrule % 255;
     }
 
     i = 0;
@@ -392,12 +430,50 @@ int main(int argc, char** argv) {
                             cell.x = c * app.cell_size * 1;
                             cell.y = r * app.cell_size * 1;
 
-                            if (app.type == TOTALISTIC3) {
+                            switch (app.type) {
 
-                                (app.grid[r][c] == 1) ? Global_set_SDL_Color(&__colors[RED]) : (app.grid[r][c] == 2) ? Global_set_SDL_Color(&__colors[BLACK]) : Global_set_SDL_Color(&__colors[WHITE]);
+                                case ELEMENTARY:
+                                    Rect_fill(&cell);
+
+                                    break ;
+
+                                case TOTALISTIC3:
+                                    (app.grid[r][c] == 1) ? Global_set_SDL_Color(&__colors[RED]) : (app.grid[r][c] == 2) ? Global_set_SDL_Color(&__colors[BLACK]) : Global_set_SDL_Color(&__colors[WHITE]);
+
+                                    Rect_fill(&cell);
+
+                                    break ;
+
+                                case MOBILE_O:
+
+                                    Global_set_SDL_Color(&__colors[BLACK]);
+                                    
+                                    switch (app.grid[r][c]) {
+                                        case 1:
+                                            Rect_fill(&cell);
+
+                                            break ;
+
+                                        case 2:
+
+                                            Global_set_SDL_Color(&__colors[RED]);
+                                            Circle_draw(c * app.cell_size * 1 + app.cell_size / 2, r * app.cell_size * 1 + app.cell_size / 2, (app.cell_size <= 2) ? 1 : app.cell_size / 2);
+
+                                            break ;
+
+                                        case 3:
+
+                                            Global_set_SDL_Color(&__colors[BLACK]);
+                                            Rect_fill(&cell);
+
+                                            Global_set_SDL_Color(&__colors[RED]);
+                                            Circle_draw(c * app.cell_size * 1 + app.cell_size / 2, r * app.cell_size * 1 + app.cell_size / 2, (app.cell_size <= 2) ? 1 : app.cell_size / 2);
+
+                                            break ;
+                                    }
+
+                                    break ;
                             }
-
-                            Rect_fill(&cell);
                         }
                     }
                 }
@@ -418,9 +494,24 @@ int main(int argc, char** argv) {
 
                         current = app.grid[app.generation];
                         previous = app.grid[app.generation - 1];
-                        
-                        /* Apply a rule */
-                        (app.type == TOTALISTIC3) ? apply_3T_CA(current, previous, app.columns, rule) : apply_2E_CA(current, previous, app.columns, app.rule);
+
+                        switch (app.type) {
+                            
+                            case TOTALISTIC3:
+                                apply_3T_CA(current, previous, app.columns, rule);
+
+                                break ;
+
+                            case ELEMENTARY:
+                                apply_2E_CA(current, previous, app.columns, app.rule);
+
+                                break ;
+
+                            case MOBILE_O:
+                                apply_MO_CA(current, previous, app.columns, app.rule, app.mrule);
+
+                                break ;
+                        }
                     }
                 }
 
@@ -448,7 +539,7 @@ int main(int argc, char** argv) {
     /* ==================== Saving an image ===================== */
     /* ========================================================== */
 
-    if ((strlen(filename) > 0) && (Window_get_context_type(app.window) == SURFACE)) {
+    if ((strlen(filename) >= 3) && (Window_get_context_type(app.window) == SURFACE)) {
 
         if (IMG_SavePNG((SDL_Surface*) app.context, filename) == -1) {
             warn_with_sys_msg(IMG_GetError());

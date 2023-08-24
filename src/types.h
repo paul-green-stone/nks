@@ -25,6 +25,7 @@
 enum CA_types {
     ELEMENTARY = 0,
     TOTALISTIC3 = 1,
+    MOBILE_O = 2,
 };
 
 /* ================================================================ */
@@ -82,6 +83,8 @@ typedef struct __application {
 
     /* Rule to apply */
     int rule;
+    /* Mobile automata rule used to identify the displacement of an active cell */
+    int mrule;
     
     /* Number of cells initialized at the start */
     int random_start_init;

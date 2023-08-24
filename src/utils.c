@@ -4,7 +4,7 @@
 
 /* ================================================================ */
 
-unsigned char* d2t(size_t number) {
+unsigned char* d2B(size_t number, int base) {
     /* =========== VARIABLES ========== */
 
     size_t i = 0;
@@ -23,9 +23,9 @@ unsigned char* d2t(size_t number) {
         for (; number > 0; i++) {
 
             /* Value to put in the array */
-            r = number % 3;
+            r = number % base;
 
-            number /= 3;
+            number /= base;
 
             rule[i] = r + '0';
         }
@@ -88,8 +88,12 @@ void print_usage_message(const char* caller_name) {
     fprintf(stdout, "\t%-16s\t%-32s\n", "--start=<n>", "Set the number of cells randomly initialized in the first generation");
 
     fprintf(stdout, "\n\t%-16s\t%-32s\n", "--type=<n>", "Set the type of the automaton");
+    fprintf(stdout, "\n\t%-16s\t%-32s\n", "", "Values:");
     fprintf(stdout, "\t%-16s\t%-32s\n", " ", "ELEMENTARY [0]: a one-dimensional automaton with two possible states for each cell");
     fprintf(stdout, "\t%-16s\t%-32s\n", " ", "TOTALISTIC3 [1]: a one-dimensional automaton with three possible states for each cell");
+    fprintf(stdout, "\t%-16s\t%-32s\n\n", " ", "MOBILE_O [2]: a one-dimensional automaton similar to cellular automata but which have a single \"active\" cell instead of updating all cells in parallel.");
+
+    fprintf(stdout, "\t%-16s\t%-32s\n", "--mrule=<n>", "Set the rule defining the displacement of an active cell");
 
     fprintf(stdout, "\n\t%-16s\n\n", "================================================================");
 
@@ -136,6 +140,12 @@ void App_info(struct __application* app) {
 
                 break ;
 
+            case MOBILE_O:
+                type = strdup("MOBILE_O");
+
+                break ;
+
+
             default:
                 type = strdup("UNKNOWN");
 
@@ -148,6 +158,11 @@ void App_info(struct __application* app) {
     /* ================================ */
 
     fprintf(stdout, "   %-29s:%29d\n", "rule", app->rule);
+
+    if (app->type == MOBILE_O) {
+        fprintf(stdout, "      %-26s:%26d\n", "mrule", app->mrule);
+    }
+
     fprintf(stdout, "   %-29s:%29s\n", "grid", (app->is_grid) ? "on" : "off");
     fprintf(stdout, "   %-29s:%29d\n", "cell", app->cell_size);
     fprintf(stdout, "   %-29s:%29ld\n", "rows", app->rows);

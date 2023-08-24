@@ -12,7 +12,7 @@
  * 
  * @return the ternary representaion of the decimal number on success, NULL on failure
 */
-extern unsigned char* d2t(size_t number);
+extern unsigned char* d2B(size_t number, int base);
 
 /* ================================================================ */
 

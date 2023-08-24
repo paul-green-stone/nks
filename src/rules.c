@@ -2,16 +2,6 @@
 
 /* ================================================================ */
 
-/**
- * Generate the next generation of an elementary cellular automaton.
- * 
- * @param current the current generation
- * @param previous the previous generation. The one that is being used as an input to produce the current generation
- * @param size the size of array, generations
- * @param rule rule to apply
- * 
- * @return none. Upon return, `current` array contains the current generation of the automaton.
-*/
 void apply_2E_CA(unsigned char* current, unsigned char* previous, ssize_t size, unsigned char rule) {
     /* =========== VARIABLES ========== */
 
@@ -28,7 +18,7 @@ void apply_2E_CA(unsigned char* current, unsigned char* previous, ssize_t size, 
     char right;
 
     /* New value of the cell in the current generation */
-    char value;
+    char total;
 
     /* ================================ */
 
@@ -46,11 +36,11 @@ void apply_2E_CA(unsigned char* current, unsigned char* previous, ssize_t size, 
         right = ((i + 1) >= size) ? previous[0] : previous[i + 1];
 
         /* Value is used as an array index */
-        value = 4 * left + 2 * middle + right;
+        total = 4 * left + 2 * middle + right;
 
         /* ================================ */
 
-        current[i] = (rule >> value) & 1;
+        current[i] = (rule >> total) & 1;
     }
 
     /* ================================ */
@@ -61,16 +51,6 @@ void apply_2E_CA(unsigned char* current, unsigned char* previous, ssize_t size, 
 
 /* ================================================================ */
 
-/**
- * Generate the next generation of a totalistic cellular automaton with 3 colors.
- * 
- * @param current the current generation
- * @param previous the previous generation. The one that is being used as an input to produce the current generation
- * @param size the size of array, generations
- * @param rule rule to apply. This is an array representing a ternary number
- * 
- * @return none. Upon return, `current` array contains the current generation of the automaton.
-*/
 void apply_3T_CA(unsigned char* current, unsigned char* previous, ssize_t size, const unsigned char* rule) {
     /* =========== VARIABLES ========== */
 
@@ -82,7 +62,7 @@ void apply_3T_CA(unsigned char* current, unsigned char* previous, ssize_t size, 
 
     /* ================================ */
 
-    for (; i < size; i ++) {
+    for (; i < size; i++) {
 
         left = ((i - 1) < 0) ? previous[size - 1] : previous[i - 1];
         middle = previous[i];
@@ -91,6 +71,55 @@ void apply_3T_CA(unsigned char* current, unsigned char* previous, ssize_t size, 
         total = left + middle + right;
 
         current[i] = rule[total] - '0';
+    }
+
+    /* ================================ */
+
+    return ;
+}
+
+/* ================================================================ */
+
+void apply_MO_CA(unsigned char* current, unsigned char* previous, ssize_t size, ssize_t rule_1, ssize_t rule_2) {
+    /* =========== VARIABLES ========== */
+
+    /**
+     * 2 corresponds to an active cell with white color (2 = 2 + 0)
+     * 3 corresponds to an active cell with black color (3 = 2 + 1) 
+    */
+
+    ssize_t i = 0;
+
+    unsigned char left, middle, right;
+
+    unsigned char total = 0;
+
+    /* ================================ */
+
+    for (; i < size; i++) {
+
+        if (previous[i] > 1) {
+
+            left = ((i - 1) < 0) ? previous[size - 1] : previous[i - 1];
+            middle = previous[i] - 2;
+            right = ((i + 1) >= size) ? previous[0] : previous[i + 1];
+
+            total = (4 * left) + (2 * middle) + right;
+
+            /* ========= Determine the color of the active cell ========= */
+            current[i] += (rule_1 >> (total)) & 1;
+
+            /* ===== Determine the displacement of the active cell ====== */
+            if ((rule_2 >> total) & 1) {
+                current[((i - 1) < 0) ? size - 1 : i - 1] += 2; 
+            }
+            else {
+                current[((i + 1) >= size) ? 0 : i + 1] += 2; 
+            }
+        }
+        else {
+            current[i] += previous[i];
+        }
     }
 
     /* ================================ */
