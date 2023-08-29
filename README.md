@@ -12,7 +12,6 @@ A **New Kind of Science** - cellular automata (CA). Inpired by Steven Wolfram's 
 4. [Usage](#usage)
 5. [Examples](#examples)
 6. [License](#license)
-7. [Images](#images)
 8. [Conclusion](#conclusion)
 
 ## Introduction
@@ -66,17 +65,22 @@ Once the `nks` is installed, you can use it to display and simulate different ru
 To help you get started, here are a few examples of cellular automata simulations you can try with the *nks*:
 
 1. **Elementary**. A type of one-dimensional cellular automaton that consists of a row of cells, each of which can be in one of two states (0 or 1). The automaton evolves over time according to a set of rules that determine the state of each cell based on its current state and the states of its two neighbors. There are 256 possible elementary automaton rules, each of which can be represented by an 8-bit binary number.
+
+![Rule 30 of elementary CA](images/rule30.png)
+
 2. **Totalistic3**. A type of cellular automaton where the new color of each cell depends only on the average color of its neighboring cells, rather than their individual colors. There are 2187 possible totalistic rules for a `TOTALISTIC3` (*r = 3*) automaton, each of which can be identified by a code number. The specific behavior and patterns of the automaton depend on the chosen rule and initial conditions.
+
+![Rule 34 of totalistic CA](images/rule34.png)
+
+3. **Mobile Automata**. Mobile automata are similar to cellular automata except that instead of updating all cells in parallel, they have just a single “active cell" that gets updated at each step - and then they have rules that specify how this active cell should move from one step to the next.
+
+![Rule 34 of totalistic CA](images/m3557.png)
 
 Please note that the exact behavior and patterns of an elementary automaton may vary depending on the chosen rule and initial conditions.
 
 ## License
 
 This project is licensed under the MIT License.
-
-## Images
-
-Something interesting will be here soon.
 
 ## Conclusion
 

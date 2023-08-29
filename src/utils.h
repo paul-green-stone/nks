@@ -43,4 +43,11 @@ void App_info(struct __application* app);
 
 /* ================================================================ */
 
+/**
+ * Parse the .xml files containing a Turing machine states
+*/
+void parse_XML_states(const App* app, const char* filename);
+
+/* ================================================================ */
+
 #endif /* UTILS_H */

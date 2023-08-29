@@ -91,7 +91,8 @@ void print_usage_message(const char* caller_name) {
     fprintf(stdout, "\n\t%-16s\t%-32s\n", "", "Values:");
     fprintf(stdout, "\t%-16s\t%-32s\n", " ", "ELEMENTARY [0]: a one-dimensional automaton with two possible states for each cell");
     fprintf(stdout, "\t%-16s\t%-32s\n", " ", "TOTALISTIC3 [1]: a one-dimensional automaton with three possible states for each cell");
-    fprintf(stdout, "\t%-16s\t%-32s\n\n", " ", "MOBILE_O [2]: a one-dimensional automaton similar to cellular automata but which have a single \"active\" cell instead of updating all cells in parallel.");
+    fprintf(stdout, "\t%-16s\t%-32s\n", " ", "MOBILE_O [2]: a one-dimensional automaton similar to cellular automata but which have a single \"active\" cell instead of updating all cells in parallel.");
+    fprintf(stdout, "\t%-16s\t%-32s\n\n", " ", "TURING_M [3]: an abstract machine that manipulates symbols on a strip of tape according to a table of rules.");
 
     fprintf(stdout, "\t%-16s\t%-32s\n", "--mrule=<n>", "Set the rule defining the displacement of an active cell");
 
@@ -109,6 +110,7 @@ void print_usage_message(const char* caller_name) {
 /* ================================================================ */
 
 void App_info(struct __application* app) {
+    /* =========== VARIABLES ========== */
 
     size_t width = 64;
 
@@ -145,6 +147,11 @@ void App_info(struct __application* app) {
 
                 break ;
 
+            case TURING_M:
+                type = strdup("TURING_M");
+
+                break ;
+
 
             default:
                 type = strdup("UNKNOWN");
@@ -157,10 +164,15 @@ void App_info(struct __application* app) {
 
     /* ================================ */
 
-    fprintf(stdout, "   %-29s:%29d\n", "rule", app->rule);
+    if (app->type != TURING_M) {
+        fprintf(stdout, "   %-29s:%29d\n", "rule", app->rule);
+    }
 
     if (app->type == MOBILE_O) {
         fprintf(stdout, "      %-26s:%26d\n", "mrule", app->mrule);
+    }
+    else if (app->type == TURING_M) {
+        fprintf(stdout, "      %-26s:%26ld\n", "states", app->machine.n_states);
     }
 
     fprintf(stdout, "   %-29s:%29s\n", "grid", (app->is_grid) ? "on" : "off");
@@ -186,6 +198,68 @@ void App_info(struct __application* app) {
 
     free(type);
 
+    /* ================================ */
+
+    return ;
+}
+
+/* ================================================================ */
+
+void parse_XML_states(const App* app, const char* filename) {
+    /* =========== VARIABLES ========== */
+
+    /* A structure containing the tree */
+    xmlDocPtr document;
+
+    xmlNodePtr current_node;
+
+    xmlChar* node_cnt;
+
+    xmlChar* state;
+
+    /* ================================ */
+
+    if ((document = xmlParseFile(filename)) != NULL) {
+
+        if ((current_node = xmlDocGetRootElement(document)) != NULL) {
+
+            if (xmlStrcmp(current_node->name, (const xmlChar*) "turing_machine")) {
+
+                warn_with_user_msg(__func__, "document of the wrong type");
+
+                return ;
+            }
+            else {
+                current_node = current_node->children;
+
+                while (current_node != NULL) {
+
+                    if ((!xmlStrcmp(current_node->name, (const xmlChar*) "state"))) {
+                        
+                        node_cnt = xmlNodeListGetString(document, current_node->children, 1);
+                        
+                        if (node_cnt) {
+                            state = xmlGetProp(current_node, (xmlChar*) "state");
+
+                            strcpy(app->machine.states[(int) strtol((char*) state, NULL, 10)], (char*) node_cnt);
+                        }
+                        
+                    }
+
+                    current_node = current_node->next;
+                }
+            }
+        }
+        else {
+
+        }
+    }
+    else {
+        warn_with_user_msg(__func__, "Document not parsed successfully");
+
+        return ;
+    }
+    
     /* ================================ */
 
     return ;

@@ -2,9 +2,9 @@ cc := gcc
 bin := nks
 
 OBJDIR := objects
-CFLAGS := -g -O2 -fpic -Wall -Wextra
+CFLAGS := -g -O2 -fpic -Wall -Wextra `xml2-config --cflags`
 
-LDFLAGS := -lSDL2 -lSDL2_image -lm
+LDFLAGS := -lSDL2 -lSDL2_image -lm `xml2-config --libs`
 
 $(OBJDIR)/main.o: main.c $(OBJDIR)/rules.o $(OBJDIR)/utils.o ps-sdl-wrapper/libps.a
 	$(cc) $(CFLAGS) -o $(bin) $^ $(LDFLAGS)

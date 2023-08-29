@@ -38,4 +38,11 @@ void apply_3T_CA(unsigned char* current, unsigned char* previous, ssize_t size, 
 */
 void apply_MO_CA(unsigned char* current, unsigned char* previous, ssize_t size, ssize_t rule_1, ssize_t rule_2);
 
+/* ================================================================ */
+
+/**
+ * 
+*/
+void apply_TM(unsigned char* current, unsigned char* previous, ssize_t size, App* app);
+
 #endif /* RULES_H */

@@ -126,3 +126,90 @@ void apply_MO_CA(unsigned char* current, unsigned char* previous, ssize_t size, 
 
     return ;
 }
+
+/* ================================================================ */
+
+void apply_TM(unsigned char* current, unsigned char* previous, ssize_t size, App* app) {
+    /* =========== VARIABLES ========== */
+
+    ssize_t i = 0;
+
+    unsigned char cell_weight = 0;
+
+    /* ================================ */
+    
+    for (; i < size; i++) {
+
+        if (previous[i] > 2) {
+
+            cell_weight = previous[i] - (app->machine.current_state + TM_WEIGHT);
+
+            switch (cell_weight) {
+                
+                /* Read */
+                case 0:
+
+                    /* Write */
+                    current[i] = app->machine.states[app->machine.current_state][1] - '0';
+                    
+                    /* Move */
+                    if (app->machine.states[app->machine.current_state][2] - '0') {
+                        current[((i + 1) >= size) ? 0 : i + 1] += TM_WEIGHT + (app->machine.states[app->machine.current_state][3] - '0');
+                    }
+                    else {
+                        current[((i - 1) < 0) ? size - 1 : i - 1] += TM_WEIGHT + (app->machine.states[app->machine.current_state][3] - '0');
+                    }
+
+                    /* Go to the state */
+                    app->machine.current_state = app->machine.states[app->machine.current_state][3] - '0';
+
+                    break ;
+
+                /* Read */
+                case 1:
+
+                    /* Write */
+                    current[i] = app->machine.states[app->machine.current_state][5] - '0';
+
+                    /* Move */
+                    if (app->machine.states[app->machine.current_state][6] - '0') {
+                        current[((i + 1) >= size) ? 0 : i + 1] += TM_WEIGHT + (app->machine.states[app->machine.current_state][7] - '0');
+                    }
+                    else {
+                        current[((i - 1) < 0) ? size - 1 : i - 1] += TM_WEIGHT + (app->machine.states[app->machine.current_state][7] - '0');
+                    }
+
+                    /*Go to the state */
+                    app->machine.current_state = app->machine.states[app->machine.current_state][7] - '0';
+
+                    break ;
+
+                /* Read */
+                case 2:
+
+                    /* Write */
+                    current[i] = app->machine.states[app->machine.current_state][9] - '0';
+                        
+                    /* Move */
+                    if (app->machine.states[app->machine.current_state][10] - '0') {
+                        current[((i + 1) >= size) ? 0 : i + 1] += TM_WEIGHT + (app->machine.states[app->machine.current_state][11] - '0');
+                    }
+                    else {
+                        current[((i - 1) < 0) ? size - 1 : i - 1] += TM_WEIGHT + (app->machine.states[app->machine.current_state][11] - '0');
+                    }
+                    
+                    /* Go to the state */
+                    app->machine.current_state = app->machine.states[app->machine.current_state][11] - '0';
+
+                    break ;
+            }
+        }
+        else {
+            current[i] += previous[i];
+        }
+    }
+
+    /* ================================ */
+
+    return ;
+}

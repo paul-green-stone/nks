@@ -1,0 +1,13 @@
+<!-- Turing machine states -->
+<!-- This is a configuration for a 2-state 3-symbol Turing machine -->
+<turing_machine>
+    <!-- Read 0: write 1, move right, go to state 1 -->
+    <!-- Read 1: write 2, move left, go to state 0 -->
+    <!-- Read 2: write 1, move left, go to state 0 -->
+    <state state="0">011112002100</state>
+
+    <!-- Read 0, write 2, move left, go to state 0 -->
+    <!-- Read 1, write 2, move right, go to state 1 -->
+    <!-- Read 2, write 0, move right, go to state 0 -->
+    <state state="1">020012112010</state>
+</turing_machine>

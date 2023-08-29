@@ -17,6 +17,9 @@
 int main(int argc, char** argv) {
     /* =========== VARIABLES ========== */
 
+    /**
+     * Current application
+    */
     App app = {
         .width = 480,
         .height = 480,
@@ -26,6 +29,8 @@ int main(int argc, char** argv) {
         .mrule = -1,
         .generation = 0,
         .random_start_init = 0,
+        .machine.n_states = 2,
+        .machine.current_state = STATE_0,
     };
 
     /* Current generation */
@@ -56,12 +61,12 @@ int main(int argc, char** argv) {
 
     /* Current command line option */
     int option;
+    /* Command line parsing realted variables */
+    extern char* optarg;
+    extern int optind, opterr, optopt;
 
     /* Coordinates of a cell to be displayed */
     SDL_Rect cell = {0, 0, app.cell_size, app.cell_size};
-
-    extern char* optarg;
-    extern int optind, opterr, optopt;
 
     /* If a rule must be converted to another base */
     unsigned char* rule = NULL;
@@ -76,15 +81,6 @@ int main(int argc, char** argv) {
         WHITE = 0,
         RED = 1,
         BLACK = 2,
-    };
-
-    /**
-     * Available colors
-    */
-    SDL_Color __colors[] = {
-        {0xff, 0xff, 0xff, 0xff}, /* White */
-        {0xff, 0x00, 0x00, 0xff}, /* Red */
-        {0x00, 0x00, 0x00, 0xff}, /* Black */
     };
 
     /* ================================ */
@@ -107,6 +103,7 @@ int main(int argc, char** argv) {
             {"help", no_argument, NULL, 0},
             {"type", required_argument, NULL, 0},           /* One of the values of CA variations */
             {"mrule", required_argument, NULL, 0},          /* Additional rule for a mobile automaton. It controlls the way an active cell should be placed */
+            {"states", required_argument, NULL, 0},         /* Number of states for a Turing machine */
             {NULL, 0, NULL, 0},
         };
 
@@ -160,7 +157,7 @@ int main(int argc, char** argv) {
                     app.type = (int) strtol(optarg, NULL, 10);
 
                     /* ======== Check for validity of the specified type ======== */
-                    if ((app.type < 0) || (app.type > 2)) {
+                    if ((app.type < 0) || (app.type > 3)) {
 
                         fprintf(stderr, "\n");
 
@@ -173,6 +170,15 @@ int main(int argc, char** argv) {
                 }
                 else if (option_index == 7) {
                     app.mrule = (int) strtol(optarg, NULL, 10);
+                }
+                else if (option_index == 8) {
+
+                    app.machine.n_states = (unsigned char) strtol(optarg, NULL, 10);
+                    
+                    /* ========== Check for validity of the TM states =========== */
+                    if ((app.machine.n_states < 2) || (app.machine.n_states > 7)) {
+                        app.machine.n_states = 2;
+                    }
                 }
 
                 break ;
@@ -235,6 +241,9 @@ int main(int argc, char** argv) {
         print_usage_message(argv[0]);
 
         return EXIT_FAILURE;
+    }
+    else if (app.type == TURING_M) {
+        parse_XML_states(&app, "states.xml");
     }
 
 
@@ -330,6 +339,9 @@ int main(int argc, char** argv) {
         /* Active cell with white color */
         else if (app.type == MOBILE_O) {
             app.grid[0][app.columns / 2] = 2;
+        }
+        else if (app.type == TURING_M) {
+            app.grid[0][app.columns / 2] = 0 + TM_WEIGHT + app.machine.current_state;
         }
     }
 
@@ -473,6 +485,47 @@ int main(int argc, char** argv) {
                                     }
 
                                     break ;
+
+                                case TURING_M:
+
+                                    if (app.grid[r][c]) {
+
+                                        switch (app.grid[r][c]) {
+                                        
+                                            case 1:
+                                                Global_set_SDL_Color(&__colors[RED]);
+                                                Rect_fill(&cell);
+
+                                                break ;
+
+                                            case 2:
+                                                Global_set_SDL_Color(&__colors[BLACK]);
+                                                Rect_fill(&cell);
+
+                                                break ;
+
+                                            /* Handling a cell with a read/write head. It's always greater than 2 (head > 2) */
+                                            default:
+
+                                                /* Let's assemble the machine state */
+                                                int machine_state = app.grid[r][c] - app.grid[(r - 1) < 0 ? r : r - 1][c];
+                                                machine_state -= (machine_state) ? TM_WEIGHT : 0;
+
+                                                /* Cell weight = current cell value - machine state - machine weight */
+                                                int cell_weight = app.grid[r][c] - (machine_state + TM_WEIGHT);
+
+                                                Global_set_SDL_Color(&__colors[cell_weight]);
+                                                Rect_fill(&cell);
+
+                                                /* Draw the head */
+                                                Global_set_SDL_Color(&head_states[machine_state]);
+                                                Circle_draw(c * app.cell_size * 1 + app.cell_size / 2, r * app.cell_size * 1 + app.cell_size / 2, (app.cell_size <= 2) ? 1 : app.cell_size / 2);
+
+                                                break ;
+                                            }
+                                    }
+
+                                    break ;
                             }
                         }
                     }
@@ -509,6 +562,11 @@ int main(int argc, char** argv) {
 
                             case MOBILE_O:
                                 apply_MO_CA(current, previous, app.columns, app.rule, app.mrule);
+
+                                break ;
+
+                            case TURING_M:
+                                apply_TM(current, previous, app.columns, &app);
 
                                 break ;
                         }
