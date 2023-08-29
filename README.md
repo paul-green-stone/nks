@@ -76,9 +76,11 @@ To help you get started, here are a few examples of cellular automata simulation
 
 ![Mobile automaton 3557](images/m3557.png)
 
-4. **Turing machine**. A mathematical model of computation describing an abstract machine[1] that manipulates symbols on a strip of tape according to a table of rules
+4. **Turing machine**. A mathematical model of computation describing an abstract machine[1] that manipulates symbols on a strip of tape according to a table of rules.
 
 ![2-state 3-symbol Turing machine](images/tm.png)
+
+**To use a Turing machine, you need to install additional software `libxml2`**
 
 Please note that the exact behavior and patterns of an elementary automaton may vary depending on the chosen rule and initial conditions.
 
